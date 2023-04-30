@@ -64,13 +64,20 @@ def print_data(handle, data):
 	f_rx = (ord(right_x)-128)/128
 	f_ry = (ord(right_y)-128)/128
 	f_lx = (ord(left_x)-128)/128
+	"""
+	if ord(left_y) >= 120:
+		f_ly = float(1.0) # 0 throttle
+	else:
+		f_ly = (ord(left_y)-128)/64 + 1 # maps top part of stick to throttle between 1 and -1 
+	"""
 	f_ly = (ord(left_y)-128)/128
+	
 
 
 	gamepad.left_joystick_float(x_value_float=f_lx, y_value_float=f_ly)  # value between 0 and 255
 	gamepad.right_joystick_float(x_value_float=f_rx, y_value_float=f_ry)  # value between 0 and 255
 	gamepad.update()
-	#print(f"lx: {f_lx} ly:{(ord(left_y)-128)/128} rx: {(ord(right_x)-128)/128} ry:{(ord(right_y)-128)/128}")
+	#print(f"ly: {f_ly}, left_y: {ord(left_y)}")
 
 	#print(button)
 	#print(data)
