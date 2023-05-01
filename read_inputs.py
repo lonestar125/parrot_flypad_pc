@@ -90,7 +90,7 @@ async def main(address):
 		services = await client.get_services()
 
 		await client.start_notify(INPUT_ID, print_data)
-		await asyncio.sleep(1000000000000)
+		await asyncio.sleep(1000000000000) #31688 years, 8 months, 25 days, 1 hour, 46 minutes, 40 seconds
 		await client.stop_notify(INPUT_ID)
 
 #C6:41:41:93:4B:73: FLYPAD_215923
