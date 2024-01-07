@@ -9,7 +9,15 @@ def print_data(handle, data):
 	converted = bytes(data)
 	#name = bytearray.decode(data, 'utf-16')
 	button = bytes(data[1:2])
+	extrabutton = bytes(data[2:3])
 	#print(button)
+
+	# Print the raw data
+	# print("Raw Data:", converted)
+
+    # Print the button value
+	# print("Button Value:", extrabutton)
+
 	if button == b'\x02':
 		#print('button 1')
 		current_state["1"] = True
@@ -33,7 +41,43 @@ def print_data(handle, data):
 		current_state["a"] = True
 		gamepad.press_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_A)
 		#gamepad.update()
-	
+    
+	elif button == b'\x20':
+		# print('R1')
+		current_state["r1"] = True
+		gamepad.press_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_RIGHT_SHOULDER)
+
+	elif button == b'\x40':
+		# print('R2')
+		current_state["r2"] = True
+		gamepad.right_trigger(value=255)
+		gamepad.update()
+
+	elif button == b'\x80':
+		# print('L1')
+		current_state["l1"] = True
+		gamepad.press_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_LEFT_SHOULDER)
+
+	elif button == b'\x01':
+		# print('take off')
+		current_state["takeoff"] = True
+		gamepad.press_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_START)
+
+	elif extrabutton == b'\x02':
+		# print('L3')
+		current_state["l3"] = True
+		gamepad.press_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_LEFT_THUMB)
+
+	elif extrabutton == b'\x01':
+		# print('L2')
+		current_state["l2"] = True
+		gamepad.left_trigger(value=255)
+
+	elif extrabutton == b'\x04':
+		# print('R3')
+		current_state["r3"] = True
+		gamepad.press_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_RIGHT_THUMB)
+
 	elif button == b'\x00':
 		if current_state["a"] == True:
 			current_state["a"] = False
@@ -55,6 +99,28 @@ def print_data(handle, data):
 			#print("release 2")
 			gamepad.release_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_Y)
 			#gamepad.update()
+		elif current_state["l3"]:
+			current_state["l3"] = False
+			gamepad.release_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_LEFT_THUMB)
+		elif current_state["r3"]:
+			current_state["r3"] = False
+			gamepad.release_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_RIGHT_THUMB)
+		elif current_state["l2"]:
+			current_state["l2"] = False
+			gamepad.left_trigger(value=0)
+		elif current_state["r2"]:
+			current_state["r2"] = False
+			gamepad.right_trigger(value=0)
+			gamepad.update()
+		elif current_state["l1"]:
+			current_state["l1"] = False
+			gamepad.release_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_LEFT_SHOULDER)
+		elif current_state["r1"]:
+			current_state["r1"] = False
+			gamepad.release_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_RIGHT_SHOULDER)
+		elif current_state["takeoff"]:
+			current_state["takeoff"] = False
+			gamepad.release_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_START)
 	
 	right_x = bytes(data[3:4])
 	right_y = bytes(data[4:5])
@@ -62,7 +128,7 @@ def print_data(handle, data):
 	left_y = bytes(data[6:7])
 
 	f_rx = (ord(right_x)-128)/128
-	f_ry = (ord(right_y)-128)/128
+	f_ry = -(ord(right_y)-128)/128
 	f_lx = (ord(left_x)-128)/128
 	"""
 	if ord(left_y) >= 120:
@@ -70,7 +136,7 @@ def print_data(handle, data):
 	else:
 		f_ly = (ord(left_y)-128)/64 + 1 # maps top part of stick to throttle between 1 and -1 
 	"""
-	f_ly = (ord(left_y)-128)/128
+	f_ly = -(ord(left_y)-128)/128
 	
 
 
@@ -101,6 +167,6 @@ if __name__ == "__main__":
 	global gamepad
 	gamepad = vg.VX360Gamepad()
 	global current_state
-	current_state = {"a": False, "b": False, "1": False, "2": False, "left_x": 0, "left_y": 0, "right_x": 0, "right_y": 0}
+	current_state = {"a": False, "b": False, "1": False, "2": False, "left_x": 0, "left_y": 0, "right_x": 0, "right_y": 0, "l3": False, "r3": False, "l2": 0, "r2": 0, "l1": False, "r1": False, "takeoff": False}
 	print('address:', address)
 	asyncio.run(main(address))
